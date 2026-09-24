@@ -1,0 +1,15 @@
+{
+  "name": "example",
+  "title": "Example",
+  "icon": "i-plug",
+  "version": "1.0.0",
+  "description": "The shape of an extension: one handler per hook, one setting of each kind, storage and a route. Copy it, rename it, keep what you need.",
+  "hooks": ["seat.title", "seat.opening", "routes"],
+  "settings": {
+    "mark": { "type": "string", "default": "★", "label": "mark", "description": "put before the title of every chat whose mission mentions the word", "placeholder": "★" },
+    "word": { "type": "string", "default": "example", "label": "word", "description": "the word to look for in the mission" },
+    "loud": { "type": "boolean", "default": false, "label": "loud", "description": "also append the count of chats seen so far" },
+    "where": { "type": "dropdown", "default": "title", "label": "where", "data": [{ "title": "in the title", "value": "title" }, { "title": "in the mission", "value": "mission" }] },
+    "token": { "type": "password", "label": "token", "description": "not used by the example; here to show a secret never reaches the config file" }
+  }
+}
