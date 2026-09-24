@@ -1,0 +1,23 @@
+name: ci
+permissions:
+  contents: read
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test --test-timeout=60000 */*.test.mjs
+      - name: every extension imports nothing outside its own folder
+        run: |
+          set -e
+          for f in */*.mjs; do
+            if grep -qE 'from "\.\./' "$f"; then echo "$f reaches outside its folder"; exit 1; fi
+          done

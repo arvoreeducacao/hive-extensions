@@ -1,0 +1,11 @@
+{
+  "name": "linear",
+  "title": "Linear",
+  "icon": "i-list",
+  "version": "1.0.0",
+  "description": "A mission that leads with an issue key, or a Linear url, opens the seat with the issue: description, branch, title, errand and name. The palette lists the issues assigned to you.",
+  "hooks": ["seat.opening", "routes"],
+  "settings": {
+    "token": { "type": "password", "label": "API key", "description": "a personal API key from linear.app settings. Left empty, LINEAR_API_KEY from the hub .env is used.", "placeholder": "lin_api_…" }
+  }
+}
