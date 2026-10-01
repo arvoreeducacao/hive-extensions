@@ -31,6 +31,7 @@ One folder, named like the extension, with these files:
 linear/
   extension.json     the manifest: what it is, which hooks it asks for, which settings it exposes
   index.mjs          the module: a default export that receives the hive and registers handlers
+  logo.svg           optional: the mark of the service it talks to
   linear.test.mjs    its tests, node --test, no framework
   *.mjs              anything else it needs — nothing outside the folder
 ```
@@ -42,6 +43,7 @@ linear/
   "name": "linear",
   "title": "Linear",
   "icon": "i-list",
+  "logo": "logo.svg",
   "version": "1.0.0",
   "description": "one line, what it does",
   "hooks": ["seat.opening", "routes"],
@@ -59,6 +61,7 @@ linear/
 |---|---|
 | `name` | the folder's name: lowercase words joined by hyphens, at most 40 characters |
 | `title`, `icon` | what the panel shows; `icon` is the id of one of the app's symbols (`i-plug`, `i-list`, `i-hash`…). Both optional |
+| `logo` | an SVG file inside the folder, square, in the colours of the service it talks to. The panel and the catalog show it in place of the icon; without it they show the first letter. A hive that does not know the field ignores it |
 | `version` | a short string like `1.0.0` |
 | `hooks` | at least one of `seat.title`, `seat.opening`, `routes`, `tasks.read`, `tasks.changed`. A hook the app does not know keeps the extension from loading; a hook registered but not declared here is ignored |
 | `settings` | types `string`, `number`, `boolean`, `password`, `dropdown` (with `data`). Each can carry `label`, `description`, `placeholder`, `required`, `default` (never on a `password`). The panel builds the form from this. A `required` setting still empty keeps the extension from running, and the panel says so |
