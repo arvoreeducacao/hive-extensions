@@ -12,6 +12,15 @@ into your hub or your machine and turn on in the extensions panel.
 
 ## Installing one
 
+In the hive, open the extensions panel (palette: "extensions") and go to the
+**explore** tab: every extension here shows as a card, and **install** puts it in
+`~/.hive/extensions`, turned on, without reopening the app. Its settings tab
+ends with **uninstall**, which only removes what the catalog installed. That
+needs a hive from 01/10/2026 on
+([dev-workspaces#1060](https://github.com/arvoreeducacao/dev-workspaces/pull/1060)).
+
+By hand, or for a hub, where everyone who opens it gets the extension:
+
 ```
 git clone https://github.com/arvoreeducacao/hive-extensions
 cp -r hive-extensions/linear ~/.hive/extensions/linear        # this machine only
