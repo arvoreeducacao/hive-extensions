@@ -7,6 +7,7 @@ into your hub or your machine and turn on in the extensions panel.
 | Extension | What it does |
 |---|---|
 | [`linear`](linear/) | a mission that leads with an issue key, or a Linear url, opens the seat with the issue: description, branch, title, errand and name; the palette lists the issues assigned to you |
+| [`todoist`](todoist/) | your own tasks (the ones only you see) mirror into a Todoist project, both ways; Todoist is asked for changes when you open the tasks |
 | [`example`](example/) | the shape of an extension, one of everything: copy it and rename it to start a new one |
 
 ## Installing one
@@ -59,7 +60,7 @@ linear/
 | `name` | the folder's name: lowercase words joined by hyphens, at most 40 characters |
 | `title`, `icon` | what the panel shows; `icon` is the id of one of the app's symbols (`i-plug`, `i-list`, `i-hash`…). Both optional |
 | `version` | a short string like `1.0.0` |
-| `hooks` | at least one of `seat.title`, `seat.opening`, `routes`. A hook the app does not know keeps the extension from loading; a hook registered but not declared here is ignored |
+| `hooks` | at least one of `seat.title`, `seat.opening`, `routes`, `tasks.read`, `tasks.changed`. A hook the app does not know keeps the extension from loading; a hook registered but not declared here is ignored |
 | `settings` | types `string`, `number`, `boolean`, `password`, `dropdown` (with `data`). Each can carry `label`, `description`, `placeholder`, `required`, `default` (never on a `password`). The panel builds the form from this. A `required` setting still empty keeps the extension from running, and the panel says so |
 
 Values live in `~/.hive/config.jsonc` under `extensions.<name>.settings`; a
@@ -112,12 +113,29 @@ registered twice is reported and not registered. The handler
 that status. Any other exception answers 500, is listed as a problem, and the
 route keeps serving. While the extension is off, its routes answer 404.
 
+**`tasks.read`** — `async ({ tasks, settings }) => void`.
+When someone opens the tasks, before the list is answered. `tasks` reaches only
+the personal tasks of whoever runs the hive: `list()`, `add({ text, done })`,
+`edit(id, { text, done })` and `remove(id)`. What it writes there does not come
+back through `tasks.changed`. 4000 ms per extension; past that the list is
+answered without waiting, and what it writes afterwards shows the next time.
+
+**`tasks.changed`** — `async ({ change, task, before, settings }) => void`.
+After a task this person owns was written from the hive: `change` is `added`,
+`edited` or `removed`, `task` is how it ended up and `before` how it was. It
+runs after the answer went out. Personal and shared tasks both arrive;
+`task.who` says which.
+
+The two task hooks arrived in the hive on 01/10/2026
+([dev-workspaces#1056](https://github.com/arvoreeducacao/dev-workspaces/pull/1056)); an
+older hive refuses an extension that asks for them.
+
 Extensions run in order: built-in, hub, personal, alphabetical within each. The
 second receives what the first returned.
 
 ### What holds
 
-- An exception in `seat.title` or `seat.opening` is reported and that hook is
+- An exception in `seat.title`, `seat.opening`, `tasks.read` or `tasks.changed` is reported and that hook is
   skipped until the extension is turned on again. It never takes the app down.
 - A module is imported once per app run; a change on disk shows as stale and
   asks for the app to be reopened.

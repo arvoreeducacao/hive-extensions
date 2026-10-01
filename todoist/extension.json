@@ -1,0 +1,22 @@
+{
+  "name": "todoist",
+  "title": "Todoist",
+  "icon": "i-check",
+  "version": "1.0.0",
+  "description": "Keeps your own tasks (the ones only you see) in a Todoist project, both ways. Todoist is checked when you open the tasks.",
+  "hooks": ["tasks.read", "tasks.changed"],
+  "settings": {
+    "token": {
+      "type": "password",
+      "label": "API token",
+      "description": "Todoist › Settings › Integrations › Developer",
+      "required": true
+    },
+    "project": {
+      "type": "string",
+      "default": "Hive",
+      "label": "project",
+      "description": "the Todoist project that mirrors your tasks; created when missing"
+    }
+  }
+}
