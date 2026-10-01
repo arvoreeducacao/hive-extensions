@@ -2,6 +2,7 @@
   "name": "todoist",
   "title": "Todoist",
   "icon": "i-check",
+  "logo": "logo.svg",
   "version": "1.0.0",
   "description": "Keeps your own tasks (the ones only you see) in a Todoist project, both ways. Todoist is checked when you open the tasks.",
   "hooks": ["tasks.read", "tasks.changed"],

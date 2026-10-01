@@ -181,3 +181,10 @@ test("registered in a hive, the extension asks for the two hooks it declares and
   await assert.rejects(routes[0].fn({ url: new URL("http://hive/api/ext/linear/mine"), settings: {} }), (wrong) => wrong.status === 503 && wrong.message === NO_TOKEN_SAID);
   assert.equal(await hooks["seat.opening"]({ body: {}, prompt: "fix the login", settings: {} }), undefined);
 });
+
+test("the logo the manifest names is a square svg next to it", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const manifest = JSON.parse(await readFile(new URL("./extension.json", import.meta.url), "utf8"));
+  const svg = await readFile(new URL(`./${manifest.logo}`, import.meta.url), "utf8");
+  assert.match(svg, /^<svg [^>]*viewBox="0 0 24 24"/);
+});

@@ -159,3 +159,10 @@ test("the module registers exactly the two hooks its manifest declares", async (
   const manifest = JSON.parse(await readFile(new URL("./extension.json", import.meta.url), "utf8"));
   assert.deepEqual(hooks.sort(), [...manifest.hooks].sort());
 });
+
+test("the logo the manifest names is a square svg next to it", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const manifest = JSON.parse(await readFile(new URL("./extension.json", import.meta.url), "utf8"));
+  const svg = await readFile(new URL(`./${manifest.logo}`, import.meta.url), "utf8");
+  assert.match(svg, /^<svg [^>]*viewBox="0 0 24 24"/);
+});
