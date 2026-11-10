@@ -20,6 +20,18 @@ ends with **uninstall**, which only removes what the catalog installed. That
 needs a hive from 01/10/2026 on
 ([dev-workspaces#1060](https://github.com/arvoreeducacao/dev-workspaces/pull/1060)).
 
+For everyone who opens a hub, name it in the hub's `hive.json`, mapped to the
+repository it comes from. The hive installs it and turns it on at every machine
+(a hive with [dev-workspaces#1338](https://github.com/arvoreeducacao/dev-workspaces/pull/1338)):
+
+```json
+"extensions": { "1password": "arvoreeducacao/hive-extensions" }
+```
+
+Any repository works the same way, so an extension can live next to the code it
+serves: `"org/repo/folder"` for a folder that is not at the root, and
+`"org/repo@<commit>"` to pin a version.
+
 By hand, or for a hub, where everyone who opens it gets the extension:
 
 ```
