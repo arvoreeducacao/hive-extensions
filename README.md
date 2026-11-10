@@ -8,6 +8,7 @@ into your hub or your machine and turn on in the extensions panel.
 |---|---|
 | [`linear`](linear/) | a mission that leads with an issue key, or a Linear url, opens the seat with the issue: description, branch, title, errand and name; the palette lists the issues assigned to you |
 | [`todoist`](todoist/) | your own tasks (the ones only you see) mirror into a Todoist project, both ways; Todoist is asked for changes when you open the tasks |
+| [`1password`](1password/) | the `op://` references in the hub's `.env` are read from 1Password when an MCP server starts or `vault-run` runs a command; the credentials card moves a value from the `.env` into the `hub-env` item of your vault and says whether the `op` command is ready |
 | [`example`](example/) | the shape of an extension, one of everything: copy it and rename it to start a new one |
 
 ## Installing one
@@ -18,6 +19,18 @@ In the hive, open the extensions panel (palette: "extensions") and go to the
 ends with **uninstall**, which only removes what the catalog installed. That
 needs a hive from 01/10/2026 on
 ([dev-workspaces#1060](https://github.com/arvoreeducacao/dev-workspaces/pull/1060)).
+
+For everyone who opens a hub, name it in the hub's `hive.json`, mapped to the
+repository it comes from. The hive installs it and turns it on at every machine
+(a hive with [dev-workspaces#1338](https://github.com/arvoreeducacao/dev-workspaces/pull/1338)):
+
+```json
+"extensions": { "1password": "arvoreeducacao/hive-extensions" }
+```
+
+Any repository works the same way, so an extension can live next to the code it
+serves: `"org/repo/folder"` for a folder that is not at the root, and
+`"org/repo@<commit>"` to pin a version.
 
 By hand, or for a hub, where everyone who opens it gets the extension:
 
@@ -72,7 +85,8 @@ linear/
 | `title`, `icon` | what the panel shows; `icon` is the id of one of the app's symbols (`i-plug`, `i-list`, `i-hash`…). Both optional |
 | `logo` | an SVG file inside the folder, square, in the colours of the service it talks to. The panel and the catalog show it in place of the icon; without it they show the first letter. A hive that does not know the field ignores it |
 | `version` | a short string like `1.0.0` |
-| `hooks` | at least one of `seat.title`, `seat.opening`, `routes`, `tasks.read`, `tasks.changed`. A hook the app does not know keeps the extension from loading; a hook registered but not declared here is ignored |
+| `hooks` | at least one of `seat.title`, `seat.opening`, `routes`, `tasks.read`, `tasks.changed`, `secrets.read`, `secrets.store`, `secrets.status`. A hook the app does not know keeps the extension from loading; a hook registered but not declared here is ignored |
+| `secretPrefix` | the references a vault extension reads, like `op://`. Required with the `secrets.*` hooks, refused without them |
 | `settings` | types `string`, `number`, `boolean`, `password`, `dropdown` (with `data`). Each can carry `label`, `description`, `placeholder`, `required`, `default` (never on a `password`). The panel builds the form from this. A `required` setting still empty keeps the extension from running, and the panel says so |
 
 Values live in `~/.hive/config.jsonc` under `extensions.<name>.settings`; a
@@ -138,8 +152,26 @@ After a task this person owns was written from the hive: `change` is `added`,
 runs after the answer went out. Personal and shared tasks both arrive;
 `task.who` says which.
 
+**`secrets.read`** — `async ({ ref, settings }) => string`.
+A value in the hub's `.env` that starts with the extension's `secretPrefix` is a
+reference, and the hive asks the extension for the value: when the MCP gateway
+starts a server that names it, when `vault-run` gives a command its
+environment, and when the credentials card checks it. The gateway keeps each
+value in memory until the `.env` changes or the gateway reloads.
+
+**`secrets.store`** — `async ({ key, value, settings }) => { ref, where? }`.
+When someone presses "move to <title>" on a credential still in the `.env`:
+keep the value and answer the reference, starting with `secretPrefix`, that
+replaces it there. The hive writes the `.env` and reloads the gateway.
+
+**`secrets.status`** — `async ({ settings }) => [{ ok, text }]`.
+When someone presses "check the setup" on the credentials card. Each line shows
+under the extension's title, green when `ok`.
+
 The two task hooks arrived in the hive on 01/10/2026
-([dev-workspaces#1056](https://github.com/arvoreeducacao/dev-workspaces/pull/1056)); an
+([dev-workspaces#1056](https://github.com/arvoreeducacao/dev-workspaces/pull/1056)), and the
+three vault hooks with
+[dev-workspaces#1337](https://github.com/arvoreeducacao/dev-workspaces/pull/1337); an
 older hive refuses an extension that asks for them.
 
 Extensions run in order: built-in, hub, personal, alphabetical within each. The
@@ -149,10 +181,13 @@ second receives what the first returned.
 
 - An exception in `seat.title`, `seat.opening`, `tasks.read` or `tasks.changed` is reported and that hook is
   skipped until the extension is turned on again. It never takes the app down.
+  A vault hook that throws is answered to whoever asked and stays on: a vault
+  that waits for an approval fails often and works on the next read.
 - A module is imported once per app run; a change on disk shows as stale and
   asks for the app to be reopened.
-- Everything runs in the app's process, on the desktop. The pod runs no
-  extensions.
+- Everything runs in the app's process, on the desktop, except the vault
+  hooks: the MCP gateway and `vault-run` also load the vault extensions that
+  are on. The pod runs no extensions.
 
 The authoritative contract is the hive's own
 [`app/extensions/README.md`](https://github.com/arvoreeducacao/dev-workspaces/blob/main/app/extensions/README.md);

@@ -1,0 +1,9 @@
+{
+  "name": "1password",
+  "title": "1Password",
+  "icon": "i-keys",
+  "version": "1.0.0",
+  "description": "Reads the op:// references in the hub's .env from 1Password, moves a credential from the .env into your vault, and says whether the op command is ready.",
+  "hooks": ["secrets.read", "secrets.store", "secrets.status"],
+  "secretPrefix": "op://"
+}
